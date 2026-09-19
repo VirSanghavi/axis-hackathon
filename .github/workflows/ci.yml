@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, ${{ matrix.store }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, store: sqlite }
+          - { os: ubuntu-latest, store: postgres }
+          - { os: macos-latest, store: sqlite }
+    services:
+      postgres:
+        # Service containers only run on Linux; the macOS leg ignores this.
+        image: ${{ matrix.store == 'postgres' && 'postgres:17-alpine' || '' }}
+        env:
+          POSTGRES_PASSWORD: axis
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - name: bun test
+        run: bun test tests/unit tests/integration --timeout 30000
+        env:
+          AXIS_TEST_PG: ${{ matrix.store == 'postgres' && 'postgres://postgres:axis@127.0.0.1:5432/postgres' || '' }}
+
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - run: bun install --frozen-lockfile
+      - run: bun run --cwd dashboard typecheck
+      - run: bun run --cwd dashboard build
+
+  devices:
+    # Three Linux "laptops" in containers, each with a root kernel-tier daemon (chattr +i),
+    # agents over MCP, and a rogue writer that must be refused by the kernel.
+    runs-on: ubuntu-latest
+    needs: [test, dashboard]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - run: bun install --frozen-lockfile
+      - run: bun run --cwd dashboard build
+      - run: bun scripts/build.ts --host
+      - run: bun tests/devices/run.ts
+        env:
+          AXIS_DEVICE_ARCH: x64

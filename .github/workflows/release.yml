@@ -1,0 +1,26 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+      - run: bun install --frozen-lockfile
+      - run: bun run --cwd dashboard build
+      - run: bun scripts/build.ts
+      - name: Publish binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/bin/axis-* dist/bin/SHA256SUMS \
+            --title "Axis $GITHUB_REF_NAME" --notes "Install with the one-liner in the README." --verify-tag

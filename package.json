@@ -1,0 +1,38 @@
+{
+  "name": "axis",
+  "version": "2.0.0",
+  "description": "Kernel-enforced, function-level locks and a shared job board for every coding agent on your team.",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "bin": {
+    "axis": "src/cli/main.ts"
+  },
+  "workspaces": [
+    "dashboard"
+  ],
+  "scripts": {
+    "axis": "bun src/cli/main.ts",
+    "hub": "bun src/cli/main.ts hub",
+    "test": "bun test tests/unit tests/integration --timeout 30000",
+    "test:devices": "bun tests/devices/run.ts",
+    "typecheck": "tsc --noEmit",
+    "build:dashboard": "cd dashboard && bun run build",
+    "build": "bun run build:dashboard && bun scripts/build.ts",
+    "build:edge": "bun scripts/build-edge.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\" \"supabase/**/*.ts\"",
+    "lint": "tsc --noEmit && prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\" \"supabase/**/*.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "node-diff3": "^3.1.2",
+    "postgres": "3.4.7",
+    "tree-sitter-wasms": "0.1.13",
+    "web-tree-sitter": "0.25.10"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "3",
+    "typescript": "^5.9.0"
+  }
+}

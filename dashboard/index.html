@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content="Live board for an Axis project: function-level locks, agents, devices, jobs and enforcement events." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f6f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0d0c" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Axis</title>
+    <script>
+      // Apply a saved theme before first paint so there is no flash.
+      try {
+        var t = localStorage.getItem("axis.dashboard.theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>The Axis dashboard needs JavaScript. The same data is available with <code>axis status</code>.</noscript>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

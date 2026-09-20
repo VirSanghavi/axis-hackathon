@@ -47,19 +47,6 @@ starts enforcing. `axis doctor` then proves a locked file is really unwritable o
 machine. Teammates run `axis join <invite>` in their clone.
 [Setup in detail](#setup-in-detail) is further down.
 
-## What it does
-
-Axis v2 is a rebuild of [Axis](https://useaxis.dev). The job board and shared project
-context survive. Almost everything else is new:
-
-- **Locks are enforced by the OS**, not by convention.
-- **Locks are per function**, not per file.
-- **A blocked agent is told why**, and can wait its turn or queue and keep working.
-- **Codex, Cursor and Gemini edits are merged exactly like Claude's**, through each
-  agent's own edit tool.
-- **Locks follow a renamed function and a moved file.** A locked file that vanishes is
-  announced, never silently unprotected.
-- **The tool surface costs a fifth of the context it used to.**
 
 ## What an agent sees
 
